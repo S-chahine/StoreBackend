@@ -15,11 +15,10 @@ require('dotenv').config();
 
 // Create a PostgreSQL connection pool
 const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_DATABASE,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
+  connectionString: process.env.DATABASE_URL, // Use the DATABASE_URL environment variable
+  ssl: {
+    rejectUnauthorized: false, // For testing purposes, you might need to disable SSL rejection
+  },
 });
 
 app.use(express.json());
@@ -52,6 +51,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/api/category', async (req, res) => {
   try {
     const client = await pool.connect();
+    console.log(pool.connectionString);
     const result = await client.query('SELECT * FROM category');
     const categories = result.rows;
 
